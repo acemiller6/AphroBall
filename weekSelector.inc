@@ -61,6 +61,9 @@ if ($curmonthN == 9) {
        $locked[3] = 2;
    }
    else if ($curday == 27) {   //This is Sunday, its special lock up until noon Central
+       $week = 3;
+       $locked[1] = 1;
+       $locked[2] = 1;
        $locked[3] = 2;
        if ($curhour >= 12) {
          $locked[3] = 1;
@@ -81,10 +84,27 @@ if ($curmonthN == 10) {
        $locked[2] = 1;
        $locked[3] = 1;
        if (($curdayL == "Thursday") && ($curhour >= 19)) {
-          $locked[4] = 1;
+          $locked[4] = 2;
        }
    }
-   else if (($curday >= 1) && ($curday <= 8)) {
+   else if (($curday > 1) && ($curday < 4)) {  //If its after Thursday, set the lock to special value of 2
+       $week = 4;
+       $locked[1] = 1;
+       $locked[2] = 1;
+       $locked[3] = 1;
+       $locked[4] = 2;
+   }
+   else if ($curday == 4) {   //This is Sunday, its special lock up until noon Central
+       $week = 4;
+       $locked[1] = 1;
+       $locked[2] = 1;
+       $locked[3] = 1;
+       $locked[4] = 2;
+       if ($curhour >= 12) {
+         $locked[4] = 1;
+       }
+   }
+   else if (($curday >= 4) && ($curday <= 8)) {
        $week = 5;
        $locked[1] = 1;
        $locked[2] = 1;
