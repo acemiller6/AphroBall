@@ -46,28 +46,18 @@ if ($curmonthN == 9) {
           // there are two sundays in this period, don't lock on the first one.
        }
    }
-   else if (($curday > 17) && ($curday <= 24)) {  // 24th is a Thursday
+   else if (($curday > 17) && ($curday <= 24)) {
        $week = 3;
        $locked[1] = 1;
        $locked[2] = 1;
-       if (($curdayL == "Thursday") && ($curhour >= 19)) {  // is it 7pm on Thursday?
-          $locked[3] = 2;
+       if (($curdayL == "Thursday") && ($curhour >= 19)) {
+          $locked[3] = 1;
        }
    }
-   else if (($curday > 24) && ($curday < 27)) {  //If its after Thursday, set the lock to special value of 2
-       $week = 3;
-       $locked[1] = 1;
-       $locked[2] = 1;
-       $locked[3] = 2;
-   }
-   else if ($curday == 27) {   //This is Sunday, its special lock up until noon Central
-       $locked[3] = 2;
-       if ($curhour >= 12) {
-         $locked[3] = 1;
-       }
-   }
-   else if ($curday > 27) {   //After Sunday its obviously next week
+   else if ($curday > 24) {
        $week = 4;
+       $locked[1] = 1;
+       $locked[2] = 1;
        $locked[3] = 1;
    }
 }

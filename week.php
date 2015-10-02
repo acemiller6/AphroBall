@@ -384,11 +384,7 @@ This is an automated response so don't reply to this address
       }
 
       // determine whether or not the week is locked
-      if ($locked[$week] == 2) {
-          $isLocked = "is partially locked";
-          $noThurs = 1;
-      }
-      elseif ($locked[$week] == 1) {
+      if ($locked[$week]) {
           $isLocked = "is locked";
           $noSubmit = 1;
       }
@@ -522,73 +518,42 @@ This is an automated response so don't reply to this address
               //printf("%s:%s:%s:%s:%s:", $visWin,$homeWin,$marg,$row["visitor"],$userPick["winner"]);
               //printf("%s<br>", $i);
 
-              //if its after Thursday, we need to get rid of the radio buttons to select this game
-              if(($i == 1)&&($noThurs == 1)) {
-                // begin printing out the schedule
-                printf("                      <tr bgcolor=\"$rowcol\">
-                           <td><img src=\"../images/%s\"></td>
-                           <td> </td>
-                           <td><b>%s</b><br>   Rec($aw-$al)  PF($ptsFor) PA($ptsAgainst)<br>
-                                   Last 5: ($afw-$afl) &nbsp; Road Rec($arw-$arl)</td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><center>at</center></td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><img src=\"../images/%s\"></td>
-                           <td> </td>
-                           <td><b>%s</b><br>   Rec($hw-$hl)  PF($pointsFor) PA($pointsAgainst)<br>
-                                   Last 5: ($hfw-$hfl) &nbsp; Home Rec($hrw-$hrl)</td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td> ",
-                                   $teampic[$row["visitor"]],$team[$row["visitor"]],
-                                   $teampic[$row["home"]],$team[$row["home"]]);
-                if ($visWin || $homeWin) {
-                   echo " $marg";
-                }
-                echo "></td>
-                           <td>&nbsp;</td>
-                        </tr>\n";
+              // begin printing out the schedule
+              printf("                      <tr bgcolor=\"$rowcol\">
+                         <td><img src=\"../images/%s\"></td>
+                         <td><input type=\"radio\" name=\"game$i\" value=\"visitor\"",
+                 $teampic[$row["visitor"]]);
+              if ($visWin) {
+                echo " checked";
+              }
+              printf ("></td>
+                         <td><b>%s</b><br>   Rec($aw-$al)  PF($ptsFor) PA($ptsAgainst)<br>
+                                 Last 5: ($afw-$afl) &nbsp; Road Rec($arw-$arl)</td>
+                         <td>&nbsp;</td>
+                         <td>&nbsp;</td>
+                         <td><center>at</center></td>
+                         <td>&nbsp;</td>
+                         <td>&nbsp;</td>
+                         <td><img src=\"../images/%s\"></td>
+                         <td><input type=\"radio\" name=\"game$i\" value=\"home\"",
+                                 $team[$row["visitor"]], $teampic[$row["home"]]);
+              if ($homeWin) {
+                echo " checked";
+              }
+              printf("></td>
+                         <td><b>%s</b><br>   Rec($hw-$hl)  PF($pointsFor) PA($pointsAgainst)<br>
+                                 Last 5: ($hfw-$hfl) &nbsp; Home Rec($hrw-$hrl)</td>
+                         <td>&nbsp;</td>
+                         <td>&nbsp;</td>
+                         <td><input type=text size=2 name=\"spread$i\"",
+                                 $team[$row["home"]]);
+              if ($visWin || $homeWin) {
+                 echo " value=\"$marg\"";
+              }
+              echo "></td>
+                         <td>&nbsp;</td>
+                      </tr>\n";
 
-              }
-              else {      // allow picking the Thursday game
-                // begin printing out the schedule
-                printf("                      <tr bgcolor=\"#$rowcol\">
-                           <td><img src=\"../images/%s\"></td>
-                           <td><input type=\"radio\" name=\"game$i\" value=\"visitor\"",
-                   $teampic[$row["visitor"]]);
-                if ($visWin) {
-                  echo " checked";
-                }
-                printf ("></td>
-                           <td><b>%s</b><br>   Rec($aw-$al)  PF($ptsFor) PA($ptsAgainst)<br>
-                                   Last 5: ($afw-$afl) &nbsp; Road Rec($arw-$arl)</td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><center>at</center></td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><img src=\"../images/%s\"></td>
-                           <td><input type=\"radio\" name=\"game$i\" value=\"home\"",
-                                   $team[$row["visitor"]], $teampic[$row["home"]]);
-                if ($homeWin) {
-                  echo " checked";
-                }
-                printf("></td>
-                           <td><b>%s</b><br>   Rec($hw-$hl)  PF($pointsFor) PA($pointsAgainst)<br>
-                                   Last 5: ($hfw-$hfl) &nbsp; Home Rec($hrw-$hrl)</td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><input type=text size=2 name=\"spread$i\"",
-                                   $team[$row["home"]]);
-                if ($visWin || $homeWin) {
-                   echo " value=\"$marg\"";
-                }
-                echo "></td>
-                           <td>&nbsp;</td>
-                        </tr>\n";
-              }
               // loop through the rows
               $row = mysql_fetch_array($result);
 
@@ -600,12 +565,11 @@ This is an automated response so don't reply to this address
           // picks haven't been submitted yet, so print an empty week
           else {
 
-            //if its after Thursday, we need to get rid of the radio buttons to select this game
-            if(($i == 1)&&($noThurs == 1)) {
+
              // begin printing out the schedule
              printf("                            <tr bgcolor=\"$rowcol\">
                          <td><img src=\"../images/%s\"></td>
-                         <td> </td>
+                         <td><input type=\"radio\" name=\"game$i\" value=\"visitor\"></td>
                          <td><b>%s</b><br>   Rec($aw-$al)  PF($ptsFor) PA($ptsAgainst)<br>
                                  Last 5: ($afw-$afl) &nbsp; Road Rec($arw-$arl)</td>
                          <td>&nbsp;</td>
@@ -614,42 +578,17 @@ This is an automated response so don't reply to this address
                          <td>&nbsp;</td>
                          <td>&nbsp;</td>
                          <td><img src=\"../images/%s\"></td>
-                         <td> </td>
+                         <td><input type=\"radio\" name=\"game$i\" value=\"home\"></td>
                          <td><b>%s</b><br>   Rec($hw-$hl)  PF($pointsFor) PA($pointsAgainst)<br>
                                  Last 5: ($hfw-$hfl) &nbsp; Home Rec($hrw-$hrl)</td>
                          <td>&nbsp;</td>
                          <td>&nbsp;</td>
-                         <td> </td>
+                         <td><input type=text size=2 name=\"spread$i\"></td>
                          <td>&nbsp;</td>
                       </tr>\n",
                 $teampic[$row["visitor"]],$team[$row["visitor"]], $teampic[$row["home"]],
                  $team[$row["home"]]);
-             }
-             else {// allow picking the Thursday game
-               // begin printing out the schedule
-               printf("                            <tr bgcolor=\"$rowcol\">
-                           <td><img src=\"../images/%s\"></td>
-                           <td><input type=\"radio\" name=\"game$i\" value=\"visitor\"> </td>
-                           <td><b>%s</b><br>   Rec($aw-$al)  PF($ptsFor) PA($ptsAgainst)<br>
-                                   Last 5: ($afw-$afl) &nbsp; Road Rec($arw-$arl)</td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><center>at</center></td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><img src=\"../images/%s\"></td>
-                           <td><input type=\"radio\" name=\"game$i\" value=\"home\"> </td>
-                           <td><b>%s</b><br>   Rec($hw-$hl)  PF($pointsFor) PA($pointsAgainst)<br>
-                                   Last 5: ($hfw-$hfl) &nbsp; Home Rec($hrw-$hrl)</td>
-                           <td>&nbsp;</td>
-                           <td>&nbsp;</td>
-                           <td><input type=text size=2 name=\"spread$i\"> </td>
-                           <td>&nbsp;</td>
-                        </tr>\n",
-                  $teampic[$row["visitor"]],$team[$row["visitor"]], $teampic[$row["home"]],
-                   $team[$row["home"]]);
 
-             }
              // loop through the rows
              $row = mysql_fetch_array($result);
 

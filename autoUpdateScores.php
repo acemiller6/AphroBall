@@ -1,5 +1,6 @@
 <?php
 $ssfile = 'http://www.nfl.com/liveupdate/scorestrip/ss.xml';
+//$ssfile = './ss.xml';
 $localXML = './weekly.xml';
 $nflScores = file_get_contents($ssfile);
 file_put_contents($localXML, $nflScores);
@@ -40,50 +41,55 @@ if(file_exists($localXML)) {
     $vis = $xml->gms[0]->g[$i]['v'];
     $homePts = $xml->gms[0]->g[$i]['hs'];
     $visPts = $xml->gms[0]->g[$i]['vs'];
+    $status = $xml->gms[0]->g[$i]['q'];
 
-    //housekeeping, change JAC to JAX, NE to NWE to be compatible with my similar_text
-    if ($home == "JAC") { $home = "JAX"; }
-    elseif ($vis == "JAC") { $vis = "JAX"; }
-    if ($home == "NE") { $home = "NWE"; }
-    elseif ($vis == "NE") { $vis = "NWE"; }
-    if ($home == "ARI") { $home = "ARZ"; }
-    elseif ($vis == "ARI") { $vis = "ARZ"; }
+    //only enter here if the game is openssl_verify
+    if($status == "F" || $status == "FO") {
+      //housekeeping, change JAC to JAX, NE to NWE to be compatible with my similar_text
+      if ($home == "JAC") { $home = "JAX"; }
+      elseif ($vis == "JAC") { $vis = "JAX"; }
+      if ($home == "NE") { $home = "NWE"; }
+      elseif ($vis == "NE") { $vis = "NWE"; }
+      if ($home == "ARI") { $home = "ARZ"; }
+      elseif ($vis == "ARI") { $vis = "ARZ"; }
 
-    //see what the score differential was
-    $score = $homePts - $visPts;
-    $gm = $i+1;
+      //see what the score differential was
+      $score = $homePts - $visPts;
+      $gm = $i+1;
 
-    //check to see if the home team won
-    if ($score > 0) {
-      $win = mysql_query("UPDATE schedule2015 SET winner=\"$home\", loser=\"$vis\",
-                             vispoints=\"$visPts\", homepoints=\"$homePts\" WHERE
-                             week=\"$week\" AND gamenum=\"$gm\"");
-      echo "HomeTeam: $home   Home Pts: $homePts<br>\n";
-      echo "VisTeam: $vis     Visitor Pts: $visPts<br><br>\n";
+      //check to see if the home team won
+      if ($score > 0) {
+        $win = mysql_query("UPDATE schedule2015 SET winner=\"$home\", loser=\"$vis\",
+                               vispoints=\"$visPts\", homepoints=\"$homePts\" WHERE
+                               week=\"$week\" AND gamenum=\"$gm\"");
+        echo "HomeTeam: $home   Home Pts: $homePts<br>\n";
+        echo "VisTeam: $vis     Visitor Pts: $visPts<br><br>\n";
 
-      //store the winner and the margin in an array
-      $actualWinner[$i] = $home;
-      $actualLoser[$i]  = $vis;
-      $actualSpread[$i] = ($homePts - $visPts);
+        //store the winner and the margin in an array
+        $actualWinner[$i] = $home;
+        $actualLoser[$i]  = $vis;
+        $actualSpread[$i] = ($homePts - $visPts);
 
+      }
+      elseif ($score < 0) {
+        $win = mysql_query("UPDATE schedule2015 SET winner=\"$vis\", loser=\"$home\",
+                               vispoints=\"$visPts\", homepoints=\"$homePts\" WHERE
+                               week=\"$week\" AND gamenum=\"$gm\"");
+        echo "HomeTeam: $home    Home Pts: $homePts<br>\n";
+        echo "VisTeam: $vis    Visitor Pts: $visPts<br><br>\n";
+
+        //store the winner and the margin in an array
+        $actualWinner[$i] = $vis;
+        $actualLoser[$i]  = $home;
+        $actualSpread[$i] = ($visPts - $homePts);
+
+      }
+      else {
+        echo "you are screwed, can't account for a tie<br>";
+      }
+      echo "$vis ($vs) vs $home ($hs)<br>";
     }
-    elseif ($score < 0) {
-      $win = mysql_query("UPDATE schedule2015 SET winner=\"$vis\", loser=\"$home\",
-                             vispoints=\"$visPts\", homepoints=\"$homePts\" WHERE
-                             week=\"$week\" AND gamenum=\"$gm\"");
-      echo "HomeTeam: $home    Home Pts: $homePts<br>\n";
-      echo "VisTeam: $vis    Visitor Pts: $visPts<br><br>\n";
-
-      //store the winner and the margin in an array
-      $actualWinner[$i] = $vis;
-      $actualLoser[$i]  = $home;
-      $actualSpread[$i] = ($visPts - $homePts);
-
-    }
-    else {
-      echo "you are screwed, can't account for a tie<br>";
-    }
-    echo "$vis ($vs) vs $home ($hs)<br>";
+    else { echo "Game is not over<br>"; }
   }
   echo "<br>";
 } else {
